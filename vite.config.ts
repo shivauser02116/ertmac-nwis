@@ -2,8 +2,20 @@ import { defineConfig, type HtmlTagDescriptor, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'node:path'
+import fs from 'node:fs'
+import { fileURLToPath } from 'node:url'
 
-import siteConfiguration from './.figma/make/site.json'
+// Load Figma Make site configuration if available (local dev only).
+// Falls back to an empty object so production builds work without .figma/ tooling.
+let siteConfiguration: Record<string, unknown> = {}
+try {
+  const siteJsonPath = fileURLToPath(new URL('./.figma/make/site.json', import.meta.url))
+  if (fs.existsSync(siteJsonPath)) {
+    siteConfiguration = JSON.parse(fs.readFileSync(siteJsonPath, 'utf-8'))
+  }
+} catch {
+  // Not in a Figma Make environment — use defaults
+}
 
 
 // Vite config — https://vitejs.dev/config/
@@ -20,14 +32,14 @@ export default defineConfig(({ mode }) => {
     plugins: [
 react(),
       tailwindcss(),
-      figmaSiteConfiguration(siteConfiguration),
+      figmaSiteConfiguration(siteConfiguration as FigmaSiteConfiguration),
       figmaErrorOverlayReplay(),
       figmaReactRefreshBoundaryFallback(),
       figmaMakeKitPlugin({ storiesGlob: '/src/**/*.stories.{ts,tsx,js,jsx}' }),
     ],
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, './src'),
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
     },
     server: {
