@@ -1,0 +1,10 @@
+{
+  "description": "This web application offers a streamlined interface for drilling engineers to manage well data, access reports, and utilize AI assistance, enhancing operational efficiency.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
